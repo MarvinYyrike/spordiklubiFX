@@ -130,7 +130,8 @@ public class Esipaneel extends Application {
 
                 // Close the laenutaEse stage
                 laenutaEse.close();
-            });
+            }
+            );
 
             // Add the enter button to the VBox layout
             vbox.getChildren().add(enterButton);
@@ -143,6 +144,37 @@ public class Esipaneel extends Application {
         b6.setPrefSize(300, 100);
         b6.setOnMousePressed(event -> {
             pealkiri.setText("Tagasta ese");
+            Stage tagastaEse = new Stage();
+            BorderPane uusRoot =new BorderPane();
+            Scene uusaken =new Scene(uusRoot,300,300);
+            tagastaEse.setResizable(false);
+            tagastaEse.setScene(uusaken);
+            tagastaEse.setTitle("Mida soovid tagastada?");
+            // Create two TextField controls for item and money input
+            TextField itemInput = new TextField();
+            itemInput.setPromptText("Sisesta ese");
+            // Add the text fields to the BorderPane layout
+            VBox vbox = new VBox(10, itemInput);
+            vbox.setAlignment(Pos.CENTER);
+            uusRoot.setCenter(vbox);
+            // Create the enter button
+            Button enterButton = new Button("Enter");
+            enterButton.setOnAction(e -> {
+                        // Get the input values from the text fields
+                        String itemName = itemInput.getText();
+
+                        // Find the Spordivahend object with the given name
+                        Spordivahend item = otsiSpordivahend(itemName);
+
+                        // Call the tagastab method with the input values
+                        aktiivneIsik.tagastab(item);
+
+                        // Close the laenutaEse stage
+                        tagastaEse.close();
+                    });
+            // Add the enter button to the VBox layout
+            vbox.getChildren().add(enterButton);
+            tagastaEse.show();
         });
 
 
