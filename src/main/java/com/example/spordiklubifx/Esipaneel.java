@@ -13,14 +13,22 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class Esipaneel extends Application {
 
-    public static void main(String[] args) throws Exception {
+    Osalemised osalemised = new Osalemised();
+    Isik aktiivneIsik = null;
+    Yritus aktiivneYritus = null;
+    Text valitud = new Text(valitudTekst());
+
+  public static void main(String[] args) throws Exception {
         //Loon mõned spordiesemed, mis on spordiklubil laos olemas ja on võimalik laenutada
         Spordivahendid.loeSpordivahendid("spordivahendid.txt");
         Yritused.loeYritused("yritused.txt");
@@ -30,17 +38,17 @@ public class Esipaneel extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Osalemised osalemised = new Osalemised();
-        final Isik[] aktiivneIsik = {null};
-        Yritus aktiivneYritus = null;
 
         BorderPane root = new BorderPane();
 
-        TextField pealkiri = new TextField("Mida soovid teha?");
-        pealkiri.setPrefSize(600, 25);
-        pealkiri.setAlignment(Pos.TOP_RIGHT);
+        Text pealkiri = new Text("Mida soovid teha?");
+        pealkiri.setTextAlignment(TextAlignment.CENTER);
+        pealkiri.setWrappingWidth(600);
         root.setTop(pealkiri);
 
+
+        valitud.setTextAlignment(TextAlignment.LEFT);
+        root.setLeft(valitud);
 
         Button valju = new Button("Välju");
         valju.setTextFill(Color.RED);
@@ -51,17 +59,6 @@ public class Esipaneel extends Application {
             pealkiri.setText("Välju");
             primaryStage.close();
         });
-
-        //TODO siia serLeft kasutaja loomine/sisselogimine ja näitamine, kellena sisse logitud oled
-        Button sisselogimine = new Button("Logi sisse");
-        sisselogimine.setPrefSize(200, 25);
-        root.setLeft(sisselogimine);
-        root.getLeft().maxHeight(30);
-        sisselogimine.setOnMouseClicked(event -> {
-            aktiivneIsik[0] = looUuskonto();
-
-        });
-
 
         TilePane nupud = new TilePane(2, 2);
         nupud.setPrefRows(4);
@@ -74,9 +71,11 @@ public class Esipaneel extends Application {
         b1.setOnMousePressed(event -> {
             pealkiri.setText("Sisesta üritusel osalemine");
             //järgnev, kui ei ole veel isikut loodud
-            looUuskonto();
             //siin saab valida üritused
             valiYritus();
+            if(aktiivneIsik == null) {
+              looUuskonto();
+            }
             //TODO looUuskonto ja valiYritus vajavad handle'imist
         });
 
@@ -136,12 +135,11 @@ public class Esipaneel extends Application {
 
                 // Call the laenutab method with the input values
                 LocalDate currentDate = LocalDate.now();
-                aktiivneIsik[0].laenutab(item, currentDate, money);
+                aktiivneIsik.laenutab(item, currentDate, money);
 
                 // Close the laenutaEse stage
                 laenutaEse.close();
-            }
-            );
+            });
 
             // Add the enter button to the VBox layout
             vbox.getChildren().add(enterButton);
@@ -177,7 +175,7 @@ public class Esipaneel extends Application {
                         Spordivahend item = otsiSpordivahend(itemName);
 
                         // Call the tagastab method with the input values
-                        aktiivneIsik[0].tagastab(item);
+                        aktiivneIsik.tagastab(item);
 
                         // Close the laenutaEse stage
                         tagastaEse.close();
@@ -193,6 +191,7 @@ public class Esipaneel extends Application {
         b7.setPrefSize(300, 100);
         b7.setOnMousePressed(event -> {
             pealkiri.setText("Loo uus konto");
+            looUuskonto();
         });
 
         Button b8 = new Button("Vaheta kontot");
@@ -216,22 +215,38 @@ public class Esipaneel extends Application {
 
     }
 
+  private String valitudTekst() {
+    return valitudIsikuNimi() + "\n" + valitudYrituseNimi();
+  }
+
+  private String valitudIsikuNimi() {
+      Isik aktiivne = aktiivneIsik;
+      if(aktiivne != null) {
+          return "Valitud isik: " + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
+        }
+        return "-";
+    }
+
+  private String valitudYrituseNimi() {
+    Yritus aktiivne = aktiivneYritus;
+    if(aktiivne != null) {
+      return "Valitud üritus: " + aktiivne.getNimi();
+    }
+    return "-";
+  }
+
     public void valiYritus() {
-        Stage yrituseValik =new Stage();
+        Stage yrituseValik = new Stage();
         BorderPane uusRoot = new BorderPane();
         Scene uusaken =new Scene(uusRoot,400,150);
 
         //Siia tuleb nimekiri üritustest Flowpane
-        TextField yritus = new TextField("Vali ürituse number (1-2)");
-        yritus.setPrefSize(200, 25);
-        yritus.setAlignment(Pos.TOP_RIGHT);
+        Text yritus = new Text("Vali ürituse number (1-2)");
+        yritus.setTextAlignment(TextAlignment.CENTER);
+        yritus.setWrappingWidth(600);
         uusRoot.setBottom(yritus);
 
-        Button valju1 = new Button("Välju");
-        valju1.setTextFill(Color.RED);
-        valju1.setPrefSize(100, 25);
-        uusRoot.setRight(valju1);
-        uusRoot.getBottom().maxHeight(30);
+        Button valju1 = looValjuNupp(uusRoot);
         valju1.setOnMousePressed( event2 -> {
             yrituseValik.close();});
         yrituseValik.setResizable(false);
@@ -240,7 +255,7 @@ public class Esipaneel extends Application {
         yrituseValik.show();
     }
 
-    public static Isik looUuskonto() {
+    public void looUuskonto() {
         //Konto loomise aken
         Stage uusKonto = new Stage();
         BorderPane uusRoot1 = new BorderPane();
@@ -250,45 +265,45 @@ public class Esipaneel extends Application {
         uusRoot1.setBottom(kastid);
         Scene uusaken = new Scene(uusRoot1, 400, 150);
 
-        TextField eesnimi = new TextField("Eesnimi");
+        TextField eesnimi = new TextField();
+        eesnimi.setPromptText("Eesnimi");
         eesnimi.setPrefSize(200, 25);
         eesnimi.setAlignment(Pos.TOP_RIGHT);
-        TextField perenimi = new TextField("Perenimi");
+        TextField perenimi = new TextField();
+        perenimi.setPromptText("Perenimi");
         perenimi.setPrefSize(200, 25);
         perenimi.setAlignment(Pos.TOP_RIGHT);
-        TextField synniaeg = new TextField("Sünniaeg (yyyy-mm-dd)");
+        TextField synniaeg = new TextField();
+        synniaeg.setPromptText("Sünniaeg (yyyy-mm-dd)");
         synniaeg.setPrefSize(200, 25);
         synniaeg.setAlignment(Pos.TOP_RIGHT);
-        TextField isikukood = new TextField("Isikukood");
+        TextField isikukood = new TextField();
+        isikukood.setPromptText("Isikukood");
         isikukood.setPrefSize(200, 25);
         isikukood.setAlignment(Pos.TOP_RIGHT);
         kastid.getChildren().addAll(eesnimi, perenimi, synniaeg, isikukood);
 
-        Button valju1 = new Button("Välju");
-        valju1.setTextFill(Color.RED);
-        valju1.setPrefSize(100, 25);
-        uusRoot1.setRight(valju1);
-        uusRoot1.getBottom().maxHeight(30);
-        valju1.setOnMousePressed(event2 -> {
+        Button valju1 = looValjuNupp(uusRoot1);
+        valju1.setOnMousePressed( event2 -> {
             uusKonto.close();
         });
 
-        //Andmete sisestamiseks ja Isiku loomiseks nupp
-        Button sisesta1 = new Button("Sisesta");
-        sisesta1.setTextFill(Color.GREEN);
-        sisesta1.setPrefSize(100, 25);
-        uusRoot1.setLeft(sisesta1);
-        uusRoot1.getBottom().maxHeight(30);
-        final Isik[] isik = new Isik[1];
-        sisesta1.setOnMousePressed(event -> {
+        Button salvesta = looSalvestaNupp(uusRoot1);
+        salvesta.setOnMousePressed( event2 -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String eesnimiValue = eesnimi.getText();
             String perenimiValue = perenimi.getText();
             String synniaegValue = synniaeg.getText();
-            LocalDate synniaegDate = LocalDate.parse(synniaegValue);
+            LocalDate synniaegDate = LocalDate.parse(synniaegValue, formatter);
             String isikukoodValue = isikukood.getText();
+
+            // konstruktor lisab kohe ka liikmete listi
             Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
-            isik[0] = uusIsik;
-            System.out.println("Loodud uus isik: " + uusIsik);
+
+            if(Liikmed.getLiikmed().size() == 1) {
+                aktiivneIsik = uusIsik;
+                valitud.setText(valitudTekst());
+            }
             uusKonto.close();
         });
 
@@ -296,8 +311,55 @@ public class Esipaneel extends Application {
         uusKonto.setScene(uusaken);
         uusKonto.setTitle("Kasutajat veel ei ole, sisesta palun andmed");
         uusKonto.show();
+    }
 
-        return isik[0];
+    private static Button looValjuNupp(BorderPane uusRoot1) {
+        Button valju1 = new Button("Välju");
+        valju1.setTextFill(Color.RED);
+        valju1.setPrefSize(100, 25);
+        uusRoot1.setRight(valju1);
+        uusRoot1.getBottom().maxHeight(30);
+        return valju1;
+    }
+
+    private static Button looSalvestaNupp(BorderPane uusRoot1) {
+        Button salvesta = new Button("Salvesta");
+        salvesta.setPrefSize(100, 25);
+        uusRoot1.setLeft(salvesta);
+        uusRoot1.getBottom().maxHeight(30);
+        return salvesta;
+    }
+
+    private void vaataYritusi() {
+        //To print the Spordivahendid list names
+        List<Yritus> list = Yritused.getYritused();
+        // Create a new Stage object
+        Stage newStage = new Stage();
+
+        // Create a new ListView control
+        ListView<String> listView = new ListView<>();
+
+        // Populate the ListView control with the list of Spordivahend objects
+        ObservableList<String> items = FXCollections.observableArrayList();
+        for (Yritus yritus : list) {
+            items.add(yritus.getNimi());
+        }
+
+        listView.setOnMouseClicked(event -> {
+            String nimi = listView.getSelectionModel().getSelectedItem();
+            aktiivneYritus = Yritused.otsiNimeKaudu(nimi);
+            newStage.close();
+        });
+
+        listView.setItems(items);
+        // Create a new Scene object that contains the ListView control
+        Scene scene = new Scene(listView, 400, 400);
+
+        // Set the scene of the new stage to the Scene object
+        newStage.setScene(scene);
+
+        // Show the new stage on the screen
+        newStage.show();
     }
 
 

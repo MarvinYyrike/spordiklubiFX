@@ -45,6 +45,10 @@ public class Yritused {
     }
     return null;
   }
+
+  public static List<Yritus> getYritused() {
+    return yritused;
+  }
   
 //meetod kuvab ürituste nimekirja koos järjekorranumbritega
   public static void kuvaYritused() {
