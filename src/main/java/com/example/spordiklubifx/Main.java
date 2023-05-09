@@ -138,7 +138,7 @@ public class Main {
   }
 
 
-  private static Isik looVoiValiIsik() {
+  private static Isik looVoiValiIsik() throws Exception {
     if (!Liikmed.onLiikmeid()) {
       System.out.println("Kuna klubil pole ühtegi liiget, siis palun sisesta esimene:");
       return looIsik();
@@ -196,7 +196,7 @@ public class Main {
   }
 
 
-  public static Isik looIsik() {
+  public static Isik looIsik() throws Exception {
     System.out.println("Eesnimi:");
     Scanner scannerEesnimi = new Scanner(System.in);
     String eesnimi = scannerEesnimi.next();

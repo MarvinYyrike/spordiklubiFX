@@ -12,15 +12,13 @@ public class Isik {
     private LocalDate synniaeg;
     private String isikukood;
 
-    public Isik(String eesnimi, String perenimi, LocalDate synniaeg, String isikukood) {
+    public Isik(String eesnimi, String perenimi, LocalDate synniaeg, String isikukood) throws Exception {
         this.eesnimi = eesnimi;
         this.perenimi = perenimi;
         this.synniaeg = synniaeg;
         this.isikukood = isikukood;
         Liikmed.getLiikmed().add(this);
     }
-
-
 
     public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha) {
         if (spordivahend.isKasLaos() && tasutudTagatisRaha >= spordivahend.getTagatisraha()) {

@@ -297,9 +297,18 @@ public class Esipaneel extends Application {
             String synniaegValue = synniaeg.getText();
             LocalDate synniaegDate = LocalDate.parse(synniaegValue, formatter);
             String isikukoodValue = isikukood.getText();
-
             // konstruktor lisab kohe ka liikmete listi
-            Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
+
+            Isik uusIsik;
+            try {
+                uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
+            } catch (Exception e) {
+                displayMessage("Viga: " + e.getMessage());
+                return;
+            }
+
+
+            //Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
 
             if(Liikmed.getLiikmed().size() == 1) {
                 aktiivneIsik = uusIsik;
