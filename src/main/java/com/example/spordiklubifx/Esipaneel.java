@@ -1,10 +1,13 @@
 package com.example.spordiklubifx;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
@@ -203,9 +206,26 @@ public class Esipaneel extends Application {
     private static void vaataSpordivahendeid() {
         //To print the Spordivahendid list names
         List<Spordivahend> list = Spordivahendid.getSpordivahendList();
+        // Create a new Stage object
+        Stage newStage = new Stage();
+
+        // Create a new ListView control
+        ListView<String> listView = new ListView<>();
+
+        // Populate the ListView control with the list of Spordivahend objects
+        ObservableList<String> items = FXCollections.observableArrayList();
         for (Spordivahend spordivahend : list) {
-            System.out.println(spordivahend.getNimi());
+            items.add(spordivahend.getNimi());
         }
+        listView.setItems(items);
+        // Create a new Scene object that contains the ListView control
+        Scene scene = new Scene(listView, 400, 400);
+
+        // Set the scene of the new stage to the Scene object
+        newStage.setScene(scene);
+
+        // Show the new stage on the screen
+        newStage.show();
     }
 }
 
