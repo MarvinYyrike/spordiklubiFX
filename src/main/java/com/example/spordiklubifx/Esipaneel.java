@@ -70,14 +70,11 @@ public class Esipaneel extends Application {
         });
 
         HBox hbox = new HBox();
-        hbox.setMinWidth(600);
-        hbox.setAlignment(Pos.CENTER);
+        hbox.setAlignment(Pos.BASELINE_CENTER);
         hbox.setPadding(new Insets(10));
         hbox.setSpacing(400);
-        valitudIsik.maxHeight(20);
         valitudIsik.setTextAlignment(TextAlignment.LEFT);
-        valitudYritus.maxHeight(20);
-        valitudIsik.setTextAlignment(TextAlignment.RIGHT);
+        valitudYritus.setTextAlignment(TextAlignment.LEFT);
         hbox.getChildren().addAll(valitudIsik, valitudYritus);
 
         TilePane nupud = new TilePane(2, 2);
@@ -96,7 +93,7 @@ public class Esipaneel extends Application {
             pealkiri.setText("Sisesta üritusel osalemine");
             //järgnev, kui ei ole veel isikut loodud
             //siin saab valida üritused
-            valiYritus();
+            vaataYritusi();
             if(aktiivneIsik == null) {
               looUuskonto();
             }
@@ -239,45 +236,21 @@ public class Esipaneel extends Application {
 
     }
 
-  private String valitudTekst() {
-    return valitudIsikuNimi() + "\n" + valitudYrituseNimi();
-  }
-
   private String valitudIsikuNimi() {
       Isik aktiivne = aktiivneIsik;
       if(aktiivne != null) {
-          return "Valitud isik: " + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
+          return "Valitud isik: \n" + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
         }
-        return "Valitud isik: -";
+        return "Valitud isik: - ";
     }
 
   private String valitudYrituseNimi() {
     Yritus aktiivne = aktiivneYritus;
     if(aktiivne != null) {
-      return "Valitud üritus: " + aktiivne.getNimi();
+      return "Valitud üritus: \n" + aktiivne.getNimi();
     }
     return "Valitud üritus: - ";
   }
-
-    public void valiYritus() {
-        Stage yrituseValik = new Stage();
-        BorderPane uusRoot = new BorderPane();
-        Scene uusaken =new Scene(uusRoot,400,150);
-
-        //Siia tuleb nimekiri üritustest Flowpane
-        Text yritus = new Text("Vali ürituse number (1-2)");
-        yritus.setTextAlignment(TextAlignment.CENTER);
-        yritus.setWrappingWidth(600);
-        uusRoot.setBottom(yritus);
-
-        Button valju1 = looValjuNupp(uusRoot);
-        valju1.setOnMousePressed( event2 -> {
-            yrituseValik.close();});
-        yrituseValik.setResizable(false);
-        yrituseValik.setScene(uusaken);
-        yrituseValik.setTitle("Kasutajat veel ei ole, sisesta palun andmed");
-        yrituseValik.show();
-    }
 
     public void looUuskonto() {
         //Konto loomise aken
@@ -372,6 +345,9 @@ public class Esipaneel extends Application {
         listView.setOnMouseClicked(event -> {
             String nimi = listView.getSelectionModel().getSelectedItem();
             aktiivneYritus = Yritused.otsiNimeKaudu(nimi);
+            osalemised.lisaOsalemine(aktiivneIsik, aktiivneYritus);
+            valitudYritus.setText(valitudYrituseNimi());
+
             newStage.close();
         });
 
