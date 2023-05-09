@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -27,7 +28,9 @@ public class Esipaneel extends Application {
     Osalemised osalemised = new Osalemised();
     Isik aktiivneIsik = null;
     Yritus aktiivneYritus = null;
-    Text valitud = new Text(valitudTekst());
+    Text valitudIsik = new Text(valitudIsikuNimi());
+
+    Text valitudYritus = new Text(valitudYrituseNimi());
 
   public static void main(String[] args) throws Exception {
         //Loon mõned spordiesemed, mis on spordiklubil laos olemas ja on võimalik laenutada
@@ -47,10 +50,6 @@ public class Esipaneel extends Application {
         pealkiri.setWrappingWidth(600);
         root.setTop(pealkiri);
 
-
-        valitud.setTextAlignment(TextAlignment.LEFT);
-        root.setLeft(valitud);
-
         Button valju = new Button("Välju");
         valju.setTextFill(Color.RED);
         valju.setPrefSize(200, 25);
@@ -61,10 +60,34 @@ public class Esipaneel extends Application {
             primaryStage.close();
         });
 
+        //TODO siia serLeft kasutaja loomine/sisselogimine ja näitamine, kellena sisse logitud oled
+        Button sisselogimine = new Button("Logi sisse");
+        sisselogimine.setPrefSize(200, 25);
+        root.setLeft(sisselogimine);
+        root.getLeft().maxHeight(30);
+        sisselogimine.setOnMouseClicked(event -> {
+            looUuskonto();
+        });
+
+        HBox hbox = new HBox();
+        hbox.setMinWidth(600);
+        hbox.setAlignment(Pos.CENTER);
+        hbox.setPadding(new Insets(10));
+        hbox.setSpacing(400);
+        valitudIsik.maxHeight(20);
+        valitudIsik.setTextAlignment(TextAlignment.LEFT);
+        valitudYritus.maxHeight(20);
+        valitudIsik.setTextAlignment(TextAlignment.RIGHT);
+        hbox.getChildren().addAll(valitudIsik, valitudYritus);
+
         TilePane nupud = new TilePane(2, 2);
         nupud.setPrefRows(4);
         nupud.setPrefColumns(2);
-        root.setBottom(nupud);
+
+        VBox box = new VBox();
+        box.setSpacing(8);
+        box.getChildren().addAll(hbox, nupud);
+        root.setBottom(box);
 
         Button b1 = new Button("Sisesta üritusel osalemine");
         b1.setTextFill(Color.ROYALBLUE);
@@ -154,8 +177,8 @@ public class Esipaneel extends Application {
         b6.setOnMousePressed(event -> {
             pealkiri.setText("Tagasta ese");
             Stage tagastaEse = new Stage();
-            BorderPane uusRoot =new BorderPane();
-            Scene uusaken =new Scene(uusRoot,300,300);
+            BorderPane uusRoot = new BorderPane();
+            Scene uusaken = new Scene(uusRoot,300,300);
             tagastaEse.setResizable(false);
             tagastaEse.setScene(uusaken);
             tagastaEse.setTitle("Mida soovid tagastada?");
@@ -208,7 +231,7 @@ public class Esipaneel extends Application {
 
 
         root.setPadding(new Insets(5, 5, 5, 5));
-        Scene kaader = new Scene(root, 620, 500);
+        Scene kaader = new Scene(root, 620, 600);
         primaryStage.setResizable(false);
         primaryStage.setScene(kaader);
         primaryStage.setTitle("Tere tulemast spordiklubi andmebaasi!");
@@ -225,7 +248,7 @@ public class Esipaneel extends Application {
       if(aktiivne != null) {
           return "Valitud isik: " + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
         }
-        return "-";
+        return "Valitud isik: -";
     }
 
   private String valitudYrituseNimi() {
@@ -233,7 +256,7 @@ public class Esipaneel extends Application {
     if(aktiivne != null) {
       return "Valitud üritus: " + aktiivne.getNimi();
     }
-    return "-";
+    return "Valitud üritus: - ";
   }
 
     public void valiYritus() {
@@ -303,7 +326,7 @@ public class Esipaneel extends Application {
 
             if(Liikmed.getLiikmed().size() == 1) {
                 aktiivneIsik = uusIsik;
-                valitud.setText(valitudTekst());
+                valitudIsik.setText(valitudIsikuNimi());
             }
             uusKonto.close();
         });
