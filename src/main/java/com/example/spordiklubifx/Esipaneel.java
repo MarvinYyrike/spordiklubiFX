@@ -11,9 +11,19 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.List;
+
 public class Esipaneel extends Application {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        //Loon mõned spordiesemed, mis on spordiklubil laos olemas ja on võimalik laenutada
+        Spordivahendid.loeSpordivahendid("spordivahendid.txt");
+
+        Yritused.loeYritused("yritused.txt");
+        Osalemised osalemised = new Osalemised();
+        Isik aktiivneIsik = null;
+        Yritus aktiivneYritus = null;
+
         launch(args);
     }
 
@@ -35,7 +45,6 @@ public class Esipaneel extends Application {
         valju.setOnMousePressed(event -> {
             pealkiri.setText("Välju");
             primaryStage.close();
-
         });
 
 
@@ -70,11 +79,12 @@ public class Esipaneel extends Application {
             pealkiri.setText("Vaata ürituse tulemusi");
         });
 
-        Button b4 = new Button("Vaata laenutatud esemeid");
+        Button b4 = new Button("Vaata laenutatavaid esemeid");
         b4.setTextFill(Color.ROYALBLUE);
         b4.setPrefSize(300, 100);
         b4.setOnMousePressed(event -> {
             pealkiri.setText("Vaata laenutatud esemeid");
+            vaataSpordivahendeid();
         });
 
         Button b5 = new Button("Laenuta ese");
@@ -189,6 +199,13 @@ public class Esipaneel extends Application {
         uusKonto.show();
 
 
+    }
+    private static void vaataSpordivahendeid() {
+        //To print the Spordivahendid list names
+        List<Spordivahend> list = Spordivahendid.getSpordivahendList();
+        for (Spordivahend spordivahend : list) {
+            System.out.println(spordivahend.getNimi());
+        }
     }
 }
 

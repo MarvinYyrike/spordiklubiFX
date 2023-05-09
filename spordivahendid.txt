@@ -1,0 +1,6 @@
+true, 40, tennisekomplekt, 1, 0
+true, 30, rannatennisekomplekt, 2, 0
+true, 50, suusakomplekt, 3, 0
+true, 300, õhupüstol, 4, 0
+true, 20, noolemäng, 5, 0
+true, 250, matkauisud, 6, 0
