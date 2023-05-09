@@ -219,10 +219,10 @@ public class Main {
 
     System.out.println("Isikukood:");
     Scanner scannerIsikukood = new Scanner(System.in);
-    String isikokood = scannerIsikukood.next();
+    String isikukood = scannerIsikukood.next();
 
     //Liikmed.lisaLiikmeks(isik); //pole vaja, kuna isiku loomisel (konstruktoris) luuakse kohe ka uus liige Liikmed listi
-    return new Isik(eesnimi, perenimi, synniaeg, isikokood);
+    return new Isik(eesnimi, perenimi, synniaeg, isikukood);
   }
 
   private static void vaataSpordivahendeid() {

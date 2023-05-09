@@ -31,7 +31,7 @@ public class Esipaneel extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Osalemised osalemised = new Osalemised();
-        Isik aktiivneIsik = null;
+        final Isik[] aktiivneIsik = {null};
         Yritus aktiivneYritus = null;
 
         BorderPane root = new BorderPane();
@@ -50,6 +50,16 @@ public class Esipaneel extends Application {
         valju.setOnMousePressed(event -> {
             pealkiri.setText("Välju");
             primaryStage.close();
+        });
+
+        //TODO siia serLeft kasutaja loomine/sisselogimine ja näitamine, kellena sisse logitud oled
+        Button sisselogimine = new Button("Logi sisse");
+        sisselogimine.setPrefSize(200, 25);
+        root.setLeft(sisselogimine);
+        root.getLeft().maxHeight(30);
+        sisselogimine.setOnMouseClicked(event -> {
+            aktiivneIsik[0] = looUuskonto();
+
         });
 
 
@@ -126,7 +136,7 @@ public class Esipaneel extends Application {
 
                 // Call the laenutab method with the input values
                 LocalDate currentDate = LocalDate.now();
-                aktiivneIsik.laenutab(item, currentDate, money);
+                aktiivneIsik[0].laenutab(item, currentDate, money);
 
                 // Close the laenutaEse stage
                 laenutaEse.close();
@@ -167,7 +177,7 @@ public class Esipaneel extends Application {
                         Spordivahend item = otsiSpordivahend(itemName);
 
                         // Call the tagastab method with the input values
-                        aktiivneIsik.tagastab(item);
+                        aktiivneIsik[0].tagastab(item);
 
                         // Close the laenutaEse stage
                         tagastaEse.close();
@@ -230,14 +240,15 @@ public class Esipaneel extends Application {
         yrituseValik.show();
     }
 
-    public void looUuskonto(){
+    public static Isik looUuskonto() {
+        //Konto loomise aken
         Stage uusKonto = new Stage();
         BorderPane uusRoot1 = new BorderPane();
-        TilePane kastid =new TilePane(2,2);
+        TilePane kastid = new TilePane(2, 2);
         kastid.setPrefRows(2);
         kastid.setPrefColumns(2);
         uusRoot1.setBottom(kastid);
-        Scene uusaken =new Scene(uusRoot1,400,150);
+        Scene uusaken = new Scene(uusRoot1, 400, 150);
 
         TextField eesnimi = new TextField("Eesnimi");
         eesnimi.setPrefSize(200, 25);
@@ -251,23 +262,45 @@ public class Esipaneel extends Application {
         TextField isikukood = new TextField("Isikukood");
         isikukood.setPrefSize(200, 25);
         isikukood.setAlignment(Pos.TOP_RIGHT);
-        kastid.getChildren().addAll(eesnimi,perenimi,synniaeg,isikukood);
+        kastid.getChildren().addAll(eesnimi, perenimi, synniaeg, isikukood);
 
         Button valju1 = new Button("Välju");
         valju1.setTextFill(Color.RED);
         valju1.setPrefSize(100, 25);
         uusRoot1.setRight(valju1);
         uusRoot1.getBottom().maxHeight(30);
-        valju1.setOnMousePressed( event2 -> {
-            uusKonto.close();});
+        valju1.setOnMousePressed(event2 -> {
+            uusKonto.close();
+        });
+
+        //Andmete sisestamiseks ja Isiku loomiseks nupp
+        Button sisesta1 = new Button("Sisesta");
+        sisesta1.setTextFill(Color.GREEN);
+        sisesta1.setPrefSize(100, 25);
+        uusRoot1.setLeft(sisesta1);
+        uusRoot1.getBottom().maxHeight(30);
+        final Isik[] isik = new Isik[1];
+        sisesta1.setOnMousePressed(event -> {
+            String eesnimiValue = eesnimi.getText();
+            String perenimiValue = perenimi.getText();
+            String synniaegValue = synniaeg.getText();
+            LocalDate synniaegDate = LocalDate.parse(synniaegValue);
+            String isikukoodValue = isikukood.getText();
+            Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
+            isik[0] = uusIsik;
+            System.out.println("Loodud uus isik: " + uusIsik);
+            uusKonto.close();
+        });
 
         uusKonto.setResizable(false);
         uusKonto.setScene(uusaken);
         uusKonto.setTitle("Kasutajat veel ei ole, sisesta palun andmed");
         uusKonto.show();
 
-
+        return isik[0];
     }
+
+
     private static void vaataSpordivahendeid() {
         //To print the Spordivahendid list names
         List<Spordivahend> list = Spordivahendid.getSpordivahendList();
