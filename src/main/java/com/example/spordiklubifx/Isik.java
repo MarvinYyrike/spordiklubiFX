@@ -1,5 +1,7 @@
 package com.example.spordiklubifx;
 
+import javafx.scene.control.Alert;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -21,20 +23,26 @@ public class Isik {
 
 
     public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha) {
-        if(spordivahend.isKasLaos() && tasutudTagatisRaha >= spordivahend.getTagatisraha()){
+        if (spordivahend.isKasLaos() && tasutudTagatisRaha >= spordivahend.getTagatisraha()) {
             Laenutamine laenutamine = new Laenutamine(this, spordivahend, kuupäev);
             laenutamine.getLaenutamineList().add(laenutamine);
             spordivahend.setKasLaos(false);
             spordivahend.setEsemeEestTasutudTagatisraha(tasutudTagatisRaha);
-            System.out.println("Hästi, too ese nädala pärast tagasi");
-        } else if (!spordivahend.isKasLaos()){
-            System.out.println("Eset ei ole laos");
-        } else if(tasutudTagatisRaha < spordivahend.getTagatisraha()){
-            System.out.println("Tasutud tagatisraha on liiga väike");
+            displayMessage("Hästi, too ese nädala pärast tagasi");
+        } else if (!spordivahend.isKasLaos()) {
+            displayMessage("Eset ei ole laos");
+        } else if (tasutudTagatisRaha < spordivahend.getTagatisraha()) {
+            displayMessage("Tasutud tagatisraha on liiga väike");
+        } else {
+            displayMessage("Midagi läks valesti, proovi uuesti...");
         }
-        else {
-            System.out.println("Midagi läks valesti, proovi uuesti...");
-        }
+    }
+
+
+    public void displayMessage(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public void tagastab(Spordivahend spordivahend) {
