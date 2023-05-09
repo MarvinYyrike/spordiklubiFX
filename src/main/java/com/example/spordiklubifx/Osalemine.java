@@ -1,3 +1,5 @@
+package com.example.spordiklubifx;
+
 import java.util.Objects;
 //klassi alusel luuakse uus isend osalemine, mis ühendab isikuid ja üritusi.
 public class Osalemine {

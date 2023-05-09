@@ -1,3 +1,5 @@
+package com.example.spordiklubifx;
+
 import java.time.LocalDate;
 
 //Antud klass hoiab ühte laenutamise objekti (üks inimene laenutab ühe eseme)

@@ -1,3 +1,5 @@
+package com.example.spordiklubifx;
+
 public class Spordivahend extends Spordivahendid{
     private boolean kasLaos;
     private int tagatisraha;
