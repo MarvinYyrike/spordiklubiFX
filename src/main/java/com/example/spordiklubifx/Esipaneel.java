@@ -11,9 +11,11 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class Esipaneel extends Application {
@@ -21,17 +23,17 @@ public class Esipaneel extends Application {
     public static void main(String[] args) throws Exception {
         //Loon mõned spordiesemed, mis on spordiklubil laos olemas ja on võimalik laenutada
         Spordivahendid.loeSpordivahendid("spordivahendid.txt");
-
         Yritused.loeYritused("yritused.txt");
-        Osalemised osalemised = new Osalemised();
-        Isik aktiivneIsik = null;
-        Yritus aktiivneYritus = null;
 
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Osalemised osalemised = new Osalemised();
+        Isik aktiivneIsik = null;
+        Yritus aktiivneYritus = null;
+
         BorderPane root = new BorderPane();
 
         TextField pealkiri = new TextField("Mida soovid teha?");
@@ -101,6 +103,37 @@ public class Esipaneel extends Application {
             laenutaEse.setResizable(false);
             laenutaEse.setScene(uusaken);
             laenutaEse.setTitle("Mida soovid laenutada?");
+            // Create two TextField controls for item and money input
+            TextField itemInput = new TextField();
+            itemInput.setPromptText("Sisesta ese");
+            TextField moneyInput = new TextField();
+            moneyInput.setPromptText("Sisesta summa");
+
+            // Add the text fields to the BorderPane layout
+            VBox vbox = new VBox(10, itemInput, moneyInput);
+            vbox.setAlignment(Pos.CENTER);
+            uusRoot.setCenter(vbox);
+            //make an enter button to enter data for method public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha)
+            // Create the enter button
+            Button enterButton = new Button("Enter");
+            enterButton.setOnAction(e -> {
+                // Get the input values from the text fields
+                String itemName = itemInput.getText();
+                int money = Integer.parseInt(moneyInput.getText());
+
+                // Find the Spordivahend object with the given name
+                Spordivahend item = otsiSpordivahend(itemName);
+
+                // Call the laenutab method with the input values
+                LocalDate currentDate = LocalDate.now();
+                aktiivneIsik.laenutab(item, currentDate, money);
+
+                // Close the laenutaEse stage
+                laenutaEse.close();
+            });
+
+            // Add the enter button to the VBox layout
+            vbox.getChildren().add(enterButton);
             laenutaEse.show();
         });
 
@@ -227,6 +260,25 @@ public class Esipaneel extends Application {
         // Show the new stage on the screen
         newStage.show();
     }
+    public static Spordivahend otsiSpordivahend(String spordivahendNimi) {
+        //System.out.println("Sisesta, mida tahad laenutada/tagastada");
+        //Scanner scanner = new Scanner(System.in);
+        String spordivahendiNimi = spordivahendNimi;
+        System.out.println("Võtan eseme: " + spordivahendiNimi);
+        List<Spordivahend> spordivahendid = Spordivahendid.getSpordivahendList();
+        Spordivahend valitudSpordivahend = null;
+        for (Spordivahend spordivahend : spordivahendid) {
+            if (spordivahendiNimi.equalsIgnoreCase(spordivahend.getNimi())) {
+                valitudSpordivahend = spordivahend;
+            }
+        }
+        if (valitudSpordivahend == null) {
+            System.out.println("Sellist eset ei ole...");
+        }
+        return valitudSpordivahend;
+    }
+
+
 }
 
 
