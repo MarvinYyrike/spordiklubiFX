@@ -54,19 +54,13 @@ public class Liikmed {
     return false;
   }
 
-  //Tuleviku arenduseks
-  /*
-  public static void lisaLiikmeks(Isik isik) {
-    if (onLiige(isik)) {
+  public static void lisaLiige(Isik isik) {
       liikmed.add(isik);
-    }
   }
-
-   */
 
   public static Isik otsiIsikTäisnimeJärgi(String nimi) {
     for (Isik isik : liikmed) {
-      if (nimi.toLowerCase().startsWith(isik.getEesnimi().toLowerCase()) && nimi.toLowerCase().endsWith(isik.getPerenimi().toLowerCase())) {
+      if (nimi.contains(isik.getEesnimi()) && nimi.contains(isik.getPerenimi())) {
         return isik;
       }
     }
@@ -99,7 +93,4 @@ public class Liikmed {
     return liikmed;
   }
 
-  public static void lisaLiige(Isik isik) {
-    liikmed.add(isik);
-  }
 }

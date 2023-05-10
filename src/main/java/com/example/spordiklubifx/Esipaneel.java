@@ -72,7 +72,11 @@ public class Esipaneel extends Application {
         root.getLeft().maxHeight(30);
         sisselogimine.setOnMouseClicked(event -> {
             try {
-                looUuskonto();
+                if (Liikmed.onLiikmeid()) {
+                    vahetaKontot();
+                } else {
+                    looUuskonto();
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e); //TODO paremad catchid lookonto jaoks
             }
@@ -142,44 +146,7 @@ public class Esipaneel extends Application {
         b5.setPrefSize(300, 100);
         b5.setOnMousePressed(event -> {
             pealkiri.setText("Laenuta ese");
-            Stage laenutaEse = new Stage();
-            BorderPane uusRoot = new BorderPane();
-            Scene uusaken = new Scene(uusRoot, 300, 300);
-            laenutaEse.setResizable(false);
-            laenutaEse.setScene(uusaken);
-            laenutaEse.setTitle("Mida soovid laenutada?");
-            // Create two TextField controls for item and money input
-            TextField itemInput = new TextField();
-            itemInput.setPromptText("Sisesta ese");
-            TextField moneyInput = new TextField();
-            moneyInput.setPromptText("Sisesta summa");
-
-            // Add the text fields to the BorderPane layout
-            VBox vbox = new VBox(10, itemInput, moneyInput);
-            vbox.setAlignment(Pos.CENTER);
-            uusRoot.setCenter(vbox);
-            //make an enter button to enter data for method public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha)
-            // Create the enter button
-            Button enterButton = new Button("Enter");
-            enterButton.setOnAction(e -> {
-                // Get the input values from the text fields
-                String itemName = itemInput.getText();
-                int money = Integer.parseInt(moneyInput.getText());
-
-                // Find the Spordivahend object with the given name
-                Spordivahend item = otsiSpordivahend(itemName);
-
-                // Call the laenutab method with the input values
-                LocalDate currentDate = LocalDate.now();
-                aktiivneIsik.laenutab(item, currentDate, money);
-
-                // Close the laenutaEse stage
-                laenutaEse.close();
-            });
-
-            // Add the enter button to the VBox layout
-            vbox.getChildren().add(enterButton);
-            laenutaEse.show();
+            avaLaenutaEse();
         });
 
 
@@ -239,18 +206,7 @@ public class Esipaneel extends Application {
         b8.setPrefSize(300, 100);
         b8.setOnMousePressed(event -> {
             pealkiri.setText("Vaheta kontot");
-            Stage newStage = new Stage();
-            ListView<String> listView = new ListView<>();
-            List<Isik> kuvatavadKontod = Liikmed.getLiikmed();
-            ObservableList<String> kontoomanikud = FXCollections.observableArrayList();
-            for (Isik isik : kuvatavadKontod) {
-                kontoomanikud.add(String.valueOf(isik));
-            }
-            listView.setItems(kontoomanikud);
-            Scene scene = new Scene(listView, 400, 400);
-            newStage.setScene(scene);
-            newStage.setTitle("Vali nimekirjast konto, mille vastu soovid vahetada.");
-            newStage.show();
+            vahetaKontot();
         });
 
         nupud.getChildren().addAll(b1, b2, b3, b4, b5, b6, b7, b8);
@@ -265,12 +221,76 @@ public class Esipaneel extends Application {
 
     }
 
+    private void avaLaenutaEse() {
+        Stage laenutaEse = new Stage();
+        BorderPane uusRoot = new BorderPane();
+        Scene uusaken = new Scene(uusRoot, 300, 300);
+        laenutaEse.setResizable(false);
+        laenutaEse.setScene(uusaken);
+        laenutaEse.setTitle("Mida soovid laenutada?");
+        // Create two TextField controls for item and money input
+        TextField itemInput = new TextField();
+        itemInput.setPromptText("Sisesta ese");
+        TextField moneyInput = new TextField();
+        moneyInput.setPromptText("Sisesta summa");
+
+        // Add the text fields to the BorderPane layout
+        VBox vbox = new VBox(10, itemInput, moneyInput);
+        vbox.setAlignment(Pos.CENTER);
+        uusRoot.setCenter(vbox);
+        //make an enter button to enter data for method public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha)
+        // Create the enter button
+        Button enterButton = new Button("Enter");
+        enterButton.setOnAction(e -> {
+            // Get the input values from the text fields
+            String itemName = itemInput.getText();
+            int money = Integer.parseInt(moneyInput.getText());
+
+            // Find the Spordivahend object with the given name
+            Spordivahend item = otsiSpordivahend(itemName);
+
+            // Call the laenutab method with the input values
+            LocalDate currentDate = LocalDate.now();
+            aktiivneIsik.laenutab(item, currentDate, money);
+
+            // Close the laenutaEse stage
+            laenutaEse.close();
+        });
+
+        // Add the enter button to the VBox layout
+        vbox.getChildren().add(enterButton);
+        laenutaEse.show();
+    }
+
+    private void vahetaKontot() {
+        Stage newStage = new Stage();
+        ListView<String> listView = new ListView<>();
+        List<Isik> kuvatavadKontod = Liikmed.getLiikmed();
+        ObservableList<String> kontoomanikud = FXCollections.observableArrayList();
+        for (Isik isik : kuvatavadKontod) {
+            kontoomanikud.add(String.valueOf(isik));
+        }
+        listView.setItems(kontoomanikud);
+        listView.setOnMouseClicked(event2 -> {
+            String nimi = listView.getSelectionModel().getSelectedItem();
+            aktiivneIsik = Liikmed.otsiIsikTäisnimeJärgi(nimi);
+            valitudIsik.setText(valitudIsikuNimi());
+
+            newStage.close();
+        });
+        Scene scene = new Scene(listView, 400, 400);
+        newStage.setScene(scene);
+        newStage.setTitle("Vali nimekirjast konto, mille vastu soovid vahetada.");
+        newStage.show();
+    }
+
     private void vaataTulemusi() {
         //TODO millegipärast ei kuva veel, vaata üle
         Stage newStage = new Stage();
         ListView<String> tulemusedListview = new ListView<>();
         ObservableList<String> tulemus = FXCollections.observableArrayList();
         if (aktiivneYritus == null) {
+            // TODO siin võiks kuvada warnigut juba ennem listi loomist
             String nullString = "Üritust pole valitud!";
             tulemus.add(nullString);
         } else {
@@ -280,7 +300,7 @@ public class Esipaneel extends Application {
                 tulemus.add(uusTulemus);
             }
         }
-
+        tulemusedListview.setItems(tulemus);
         Scene scene = new Scene(tulemusedListview, 400, 400);
         newStage.setScene(scene);
         newStage.setTitle("Siin näete ürituste tulemusi.");
@@ -379,14 +399,9 @@ public class Esipaneel extends Application {
     }
 
     private void vaataYritusi() {
-        //To print the Spordivahendid list names
         List<Yritus> list = Yritused.getYritused();
-        // Create a new Stage object
         Stage newStage = new Stage();
-        // Create a new ListView control
         ListView<String> listView = new ListView<>();
-
-        // Populate the ListView control with the list of Spordivahend objects
         ObservableList<String> items = FXCollections.observableArrayList();
         for (Yritus yritus : list) {
             items.add(yritus.getNimi());
@@ -402,39 +417,25 @@ public class Esipaneel extends Application {
         });
 
         listView.setItems(items);
-        // Create a new Scene object that contains the ListView control
         Scene scene = new Scene(listView, 400, 400);
-
-        // Set the scene of the new stage to the Scene object
         newStage.setScene(scene);
-
-        // Show the new stage on the screen
         newStage.show();
     }
 
 
     private static void vaataSpordivahendeid() {
-        //To print the Spordivahendid list names
         List<Spordivahend> list = Spordivahendid.getSpordivahendList();
-        // Create a new Stage object
         Stage newStage = new Stage();
-
-        // Create a new ListView control
         ListView<String> listView = new ListView<>();
 
-        // Populate the ListView control with the list of Spordivahend objects
         ObservableList<String> items = FXCollections.observableArrayList();
         for (Spordivahend spordivahend : list) {
             items.add(spordivahend.getNimi());
         }
         listView.setItems(items);
-        // Create a new Scene object that contains the ListView control
         Scene scene = new Scene(listView, 400, 400);
 
-        // Set the scene of the new stage to the Scene object
         newStage.setScene(scene);
-
-        // Show the new stage on the screen
         newStage.show();
     }
 
