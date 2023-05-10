@@ -466,7 +466,7 @@ public class Esipaneel extends Application {
             }
         }
         if (valitudSpordivahend == null) {
-            System.out.println("Sellist eset ei ole...");
+            displayMessage("Sellist eset ei ole...");
         }
         return valitudSpordivahend;
     }
