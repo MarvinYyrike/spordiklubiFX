@@ -19,10 +19,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Esipaneel extends Application {
@@ -34,13 +32,12 @@ public class Esipaneel extends Application {
 
     Text valitudYritus = new Text(valitudYrituseNimi());
 
-    private List<Isik> kontoloojad;
-
     public static void main(String[] args) throws Exception {
         //Loon mõned spordiesemed, mis on spordiklubil laos olemas ja on võimalik laenutada
         Spordivahendid.loeSpordivahendid("spordivahendid.txt");
         Yritused.loeYritused("yritused.txt");
         Liikmed.loeLiikmed("kontod.txt");
+
         launch(args);
     }
 
@@ -60,7 +57,12 @@ public class Esipaneel extends Application {
         root.setRight(valju);
         root.getRight().maxHeight(30);
         valju.setOnMousePressed(event -> {
-            pealkiri.setText("Välju");
+            try {
+                pealkiri.setText("Välju");
+                Liikmed.salvestaLiikmed("kontod.txt");
+            } catch (Exception e) {
+                throw new RuntimeException(e); //TODO paremad catchid lookonto jaoks
+            }
             primaryStage.close();
         });
 
@@ -239,7 +241,7 @@ public class Esipaneel extends Application {
             pealkiri.setText("Vaheta kontot");
             Stage newStage = new Stage();
             ListView<String> listView = new ListView<>();
-            List<Isik> kuvatavadKontod = kontoloojad;
+            List<Isik> kuvatavadKontod = Liikmed.getLiikmed();
             ObservableList<String> kontoomanikud = FXCollections.observableArrayList();
             for (Isik isik : kuvatavadKontod) {
                 kontoomanikud.add(String.valueOf(isik));
@@ -249,14 +251,6 @@ public class Esipaneel extends Application {
             newStage.setScene(scene);
             newStage.setTitle("Vali nimekirjast konto, mille vastu soovid vahetada.");
             newStage.show();
-            try {
-
-                vaataLiikmeid();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-
         });
 
         nupud.getChildren().addAll(b1, b2, b3, b4, b5, b6, b7, b8);
@@ -353,15 +347,13 @@ public class Esipaneel extends Application {
             LocalDate synniaegDate = LocalDate.parse(synniaegValue, formatter);
             String isikukoodValue = isikukood.getText();
 
-
-            // konstruktor lisab kohe ka liikmete listi
             Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
+            Liikmed.lisaLiige(uusIsik);
 
             if (Liikmed.getLiikmed().size() == 1) {
                 aktiivneIsik = uusIsik;
                 valitudIsik.setText(valitudIsikuNimi());
             }
-
             uusKonto.close();
         });
 
@@ -376,7 +368,6 @@ public class Esipaneel extends Application {
         valju1.setTextFill(Color.RED);
         valju1.setPrefSize(100, 25);
         uusRoot1.setRight(valju1);
-        uusRoot1.getBottom().maxHeight(30);
         return valju1;
     }
 
@@ -384,7 +375,6 @@ public class Esipaneel extends Application {
         Button salvesta = new Button("Salvesta");
         salvesta.setPrefSize(100, 25);
         uusRoot1.setLeft(salvesta);
-        uusRoot1.getBottom().maxHeight(30);
         return salvesta;
     }
 
@@ -472,21 +462,6 @@ public class Esipaneel extends Application {
         alert.showAndWait();
     }
 
-    public void vaataLiikmeid() throws Exception {
-        List<Isik> kontoloojad = new ArrayList<>();
-        try (DataInputStream sisse = new DataInputStream(new FileInputStream("kontod.txt"))) {
-            String eesnimi = sisse.readUTF();
-            String perenimi = sisse.readUTF();
-            String synniaeg = sisse.readUTF();
-            String isikukood = sisse.readUTF();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate synniaegDate = LocalDate.parse(synniaeg, formatter);
-            Isik uus = new Isik(eesnimi, perenimi, synniaegDate, isikukood);
-            kontoloojad.add(uus);
-            //TODO mingi list siia
-
-        }
-    }
 }
 
 

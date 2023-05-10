@@ -21,6 +21,9 @@ public class Liikmed {
     try (Scanner sc = new Scanner(fail, "UTF-8")) {
       while (sc.hasNext()) {
         String[] soned = sc.nextLine().trim().split(", ");
+        if (soned.length != 4) {
+          throw new IllegalStateException("kontod.txt fail ei ole korrektne");
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         Isik isik = new Isik(soned[0], soned[1], LocalDate.parse(soned[2], formatter), soned[3]);
         liikmed.add(isik);
@@ -30,18 +33,16 @@ public class Liikmed {
 
   public static void salvestaLiikmed(String failiNimi) throws Exception {
     File fail = new File(failiNimi);
-    FileWriter writer = new FileWriter(fail);
+    try (FileWriter writer = new FileWriter(fail)) {
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    for (Isik isik : liikmed) {
-      writer.write(isik.getEesnimi() + ", "
-          + isik.getPerenimi() + ", "
-          + isik.getSynniaeg().format(formatter) + ", "
-          + isik.getIsikukood() + "\n");
+      for (Isik isik : liikmed) {
+        writer.write(isik.getEesnimi() + ", "
+            + isik.getPerenimi() + ", "
+            + isik.getSynniaeg().format(formatter) + ", "
+            + isik.getIsikukood() + "\n");
+      }
     }
-
-    writer.close();
   }
 
   private static boolean onLiige(Isik isik) {
@@ -98,7 +99,7 @@ public class Liikmed {
     return liikmed;
   }
 
-  public static void setLiikmed(List<Isik> liikmed) {
-    Liikmed.liikmed = liikmed;
+  public static void lisaLiige(Isik isik) {
+    liikmed.add(isik);
   }
 }

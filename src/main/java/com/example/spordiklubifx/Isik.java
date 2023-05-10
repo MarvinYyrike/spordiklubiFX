@@ -17,7 +17,6 @@ public class Isik {
         this.perenimi = perenimi;
         this.synniaeg = synniaeg;
         this.isikukood = isikukood;
-        Liikmed.getLiikmed().add(this);
     }
 
     public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha) {
