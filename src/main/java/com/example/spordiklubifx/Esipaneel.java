@@ -292,7 +292,7 @@ public class Esipaneel extends Application {
             try {
                 synniaegDate = LocalDate.parse(synniaegValue, formatter);
             } catch (Exception e){
-                displayMessage("Viga: " + e.getMessage());
+                displayMessage("Midagi on kuupäeva sisestamisel valesti: " + e.getMessage());
                 return;
             }
             String isikukoodValue = isikukood.getText();
@@ -300,12 +300,7 @@ public class Esipaneel extends Application {
             // konstruktor lisab kohe ka liikmete listi
             //Isik uusIsik new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
 
-            Isik uusIsik;
-            try {
-                uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
 
             if(Liikmed.getLiikmed().size() == 1) {
                 aktiivneIsik = uusIsik;

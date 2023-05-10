@@ -12,7 +12,7 @@ public class Isik {
     private LocalDate synniaeg;
     private String isikukood;
 
-    public Isik(String eesnimi, String perenimi, LocalDate synniaeg, String isikukood) throws Exception {
+    public Isik(String eesnimi, String perenimi, LocalDate synniaeg, String isikukood) {
         this.eesnimi = eesnimi;
         this.perenimi = perenimi;
         this.synniaeg = synniaeg;
