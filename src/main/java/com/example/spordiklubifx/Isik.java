@@ -20,8 +20,6 @@ public class Isik {
         Liikmed.getLiikmed().add(this);
     }
 
-
-
     public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha) {
         if (spordivahend.isKasLaos() && tasutudTagatisRaha >= spordivahend.getTagatisraha()) {
             Laenutamine laenutamine = new Laenutamine(this, spordivahend, kuupäev);

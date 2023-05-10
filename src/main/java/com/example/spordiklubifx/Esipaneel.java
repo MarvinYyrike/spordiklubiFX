@@ -19,10 +19,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Esipaneel extends Application {
@@ -34,9 +32,7 @@ public class Esipaneel extends Application {
 
     Text valitudYritus = new Text(valitudYrituseNimi());
 
-    private List<Isik> kontoloojad;
-
-    public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
         //Loon mõned spordiesemed, mis on spordiklubil laos olemas ja on võimalik laenutada
         Spordivahendid.loeSpordivahendid("spordivahendid.txt");
         Yritused.loeYritused("yritused.txt");
@@ -64,16 +60,13 @@ public class Esipaneel extends Application {
             primaryStage.close();
         });
 
+        //TODO siia serLeft kasutaja loomine/sisselogimine ja näitamine, kellena sisse logitud oled
         Button sisselogimine = new Button("Logi sisse");
         sisselogimine.setPrefSize(200, 25);
         root.setLeft(sisselogimine);
         root.getLeft().maxHeight(30);
         sisselogimine.setOnMouseClicked(event -> {
-            try {
-                looUuskonto();
-            } catch (Exception e) {
-                throw new RuntimeException(e); //TODO paremad catchid lookonto jaoks
-            }
+            looUuskonto();
         });
 
         HBox hbox = new HBox();
@@ -101,20 +94,15 @@ public class Esipaneel extends Application {
             //järgnev, kui ei ole veel isikut loodud
             //siin saab valida üritused
             vaataYritusi();
-            if (aktiivneIsik == null) {
-                try {
-                    looUuskonto();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+            if(aktiivneIsik == null) {
+              looUuskonto();
             }
+            //TODO looUuskonto ja valiYritus vajavad handle'imist
         });
 
         Button b2 = new Button("Otsi üritusi osaleja järgi");
         b2.setTextFill(Color.GREY);
         b2.setPrefSize(300, 100);
-        b2.setDisable(true);
-        //TODO edaspidi välja arendada
         b2.setOnMousePressed(event -> {
             pealkiri.setText("Otsi üritusi osaleja järgi");
         });
@@ -124,7 +112,6 @@ public class Esipaneel extends Application {
         b3.setPrefSize(300, 100);
         b3.setOnMousePressed(event -> {
             pealkiri.setText("Vaata ürituse tulemusi");
-            vaataTulemusi();
         });
 
         Button b4 = new Button("Vaata laenutatavaid esemeid");
@@ -141,8 +128,8 @@ public class Esipaneel extends Application {
         b5.setOnMousePressed(event -> {
             pealkiri.setText("Laenuta ese");
             Stage laenutaEse = new Stage();
-            BorderPane uusRoot = new BorderPane();
-            Scene uusaken = new Scene(uusRoot, 300, 300);
+            BorderPane uusRoot =new BorderPane();
+            Scene uusaken =new Scene(uusRoot,300,300);
             laenutaEse.setResizable(false);
             laenutaEse.setScene(uusaken);
             laenutaEse.setTitle("Mida soovid laenutada?");
@@ -188,7 +175,7 @@ public class Esipaneel extends Application {
             pealkiri.setText("Tagasta ese");
             Stage tagastaEse = new Stage();
             BorderPane uusRoot = new BorderPane();
-            Scene uusaken = new Scene(uusRoot, 300, 300);
+            Scene uusaken = new Scene(uusRoot,300,300);
             tagastaEse.setResizable(false);
             tagastaEse.setScene(uusaken);
             tagastaEse.setTitle("Mida soovid tagastada?");
@@ -202,18 +189,18 @@ public class Esipaneel extends Application {
             // Create the enter button
             Button enterButton = new Button("Enter");
             enterButton.setOnAction(e -> {
-                // Get the input values from the text fields
-                String itemName = itemInput.getText();
+                        // Get the input values from the text fields
+                        String itemName = itemInput.getText();
 
-                // Find the Spordivahend object with the given name
-                Spordivahend item = otsiSpordivahend(itemName);
+                        // Find the Spordivahend object with the given name
+                        Spordivahend item = otsiSpordivahend(itemName);
 
-                // Call the tagastab method with the input values
-                aktiivneIsik.tagastab(item);
+                        // Call the tagastab method with the input values
+                        aktiivneIsik.tagastab(item);
 
-                // Close the laenutaEse stage
-                tagastaEse.close();
-            });
+                        // Close the laenutaEse stage
+                        tagastaEse.close();
+                    });
             // Add the enter button to the VBox layout
             vbox.getChildren().add(enterButton);
             tagastaEse.show();
@@ -225,11 +212,7 @@ public class Esipaneel extends Application {
         b7.setPrefSize(300, 100);
         b7.setOnMousePressed(event -> {
             pealkiri.setText("Loo uus konto");
-            try {
-                looUuskonto();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            looUuskonto();
         });
 
         Button b8 = new Button("Vaheta kontot");
@@ -237,26 +220,8 @@ public class Esipaneel extends Application {
         b8.setPrefSize(300, 100);
         b8.setOnMousePressed(event -> {
             pealkiri.setText("Vaheta kontot");
-            Stage newStage = new Stage();
-            ListView<String> listView = new ListView<>();
-            List<Isik> kuvatavadKontod = kontoloojad;
-            ObservableList<String> kontoomanikud = FXCollections.observableArrayList();
-            for (Isik isik : kuvatavadKontod) {
-                kontoomanikud.add(String.valueOf(isik));
-            }
-            listView.setItems(kontoomanikud);
-            Scene scene = new Scene(listView, 400, 400);
-            newStage.setScene(scene);
-            newStage.setTitle("Vali nimekirjast konto, mille vastu soovid vahetada.");
-            newStage.show();
-            try {
 
-                vaataLiikmeid();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
 
-//TODO ei tööta veel, aga siia oleks vaja valimisvõimalust ka.
         });
 
         nupud.getChildren().addAll(b1, b2, b3, b4, b5, b6, b7, b8);
@@ -271,46 +236,24 @@ public class Esipaneel extends Application {
 
     }
 
-    private void vaataTulemusi() {
-        //TODO millegipärast ei kuva veel, vaata üle
-        Stage newStage = new Stage();
-        ListView<String> tulemusedListview = new ListView<>();
-        ObservableList<String> tulemus = FXCollections.observableArrayList();
-        if (aktiivneYritus == null) {
-            String nullString = "Üritust pole valitud!";
-            tulemus.add(nullString);
-        } else {
-            List<Isik> tulemused = osalemised.tulemusteArvutamine(aktiivneYritus);
-            for (int i = 0; i < tulemused.size(); i++) {
-                String uusTulemus = i + 1 + ". koha sai: " + tulemused.get(i);
-                tulemus.add(uusTulemus);
-            }
-        }
-
-        Scene scene = new Scene(tulemusedListview, 400, 400);
-        newStage.setScene(scene);
-        newStage.setTitle("Siin näete ürituste tulemusi.");
-        newStage.show();
-    }
-
-    private String valitudIsikuNimi() {
-        Isik aktiivne = aktiivneIsik;
-        if (aktiivne != null) {
-            return "Valitud isik: \n" + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
+  private String valitudIsikuNimi() {
+      Isik aktiivne = aktiivneIsik;
+      if(aktiivne != null) {
+          return "Valitud isik: \n" + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
         }
         return "Valitud isik: - ";
     }
 
-    private String valitudYrituseNimi() {
-        Yritus aktiivne = aktiivneYritus;
-        if (aktiivne != null) {
-            return "Valitud üritus: \n" + aktiivne.getNimi();
-        }
-        return "Valitud üritus: - ";
+  private String valitudYrituseNimi() {
+    Yritus aktiivne = aktiivneYritus;
+    if(aktiivne != null) {
+      return "Valitud üritus: \n" + aktiivne.getNimi();
     }
+    return "Valitud üritus: - ";
+  }
 
-    public void looUuskonto() throws Exception {
-        //TODO millegipärast ei kirjuta õigesti faili
+    public void looUuskonto() {
+        //Konto loomise aken
         Stage uusKonto = new Stage();
         BorderPane uusRoot1 = new BorderPane();
         TilePane kastid = new TilePane(2, 2);
@@ -323,17 +266,14 @@ public class Esipaneel extends Application {
         eesnimi.setPromptText("Eesnimi");
         eesnimi.setPrefSize(200, 25);
         eesnimi.setAlignment(Pos.TOP_RIGHT);
-
         TextField perenimi = new TextField();
         perenimi.setPromptText("Perenimi");
         perenimi.setPrefSize(200, 25);
         perenimi.setAlignment(Pos.TOP_RIGHT);
-
         TextField synniaeg = new TextField();
         synniaeg.setPromptText("Sünniaeg (yyyy-mm-dd)");
         synniaeg.setPrefSize(200, 25);
         synniaeg.setAlignment(Pos.TOP_RIGHT);
-
         TextField isikukood = new TextField();
         isikukood.setPromptText("Isikukood");
         isikukood.setPrefSize(200, 25);
@@ -341,11 +281,12 @@ public class Esipaneel extends Application {
         kastid.getChildren().addAll(eesnimi, perenimi, synniaeg, isikukood);
 
         Button valju1 = looValjuNupp(uusRoot1);
-        valju1.setOnMousePressed(event2 -> {
+        valju1.setOnMousePressed( event2 -> {
             uusKonto.close();
         });
+
         Button salvesta = looSalvestaNupp(uusRoot1);
-        salvesta.setOnMousePressed(event2 -> {
+        salvesta.setOnMousePressed( event2 -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String eesnimiValue = eesnimi.getText();
             String perenimiValue = perenimi.getText();
@@ -353,23 +294,12 @@ public class Esipaneel extends Application {
             LocalDate synniaegDate = LocalDate.parse(synniaegValue, formatter);
             String isikukoodValue = isikukood.getText();
 
-
             // konstruktor lisab kohe ka liikmete listi
             Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
 
-            if (Liikmed.getLiikmed().size() == 1) {
+            if(Liikmed.getLiikmed().size() == 1) {
                 aktiivneIsik = uusIsik;
                 valitudIsik.setText(valitudIsikuNimi());
-            }
-            try (DataOutputStream välja = new DataOutputStream(new FileOutputStream(("kontod.txt"), true))) {
-                välja.writeUTF(eesnimiValue);
-                välja.writeUTF(perenimiValue);
-                välja.writeUTF(synniaegValue);
-                välja.writeUTF(isikukoodValue);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
             uusKonto.close();
         });
@@ -402,6 +332,7 @@ public class Esipaneel extends Application {
         List<Yritus> list = Yritused.getYritused();
         // Create a new Stage object
         Stage newStage = new Stage();
+
         // Create a new ListView control
         ListView<String> listView = new ListView<>();
 
@@ -456,7 +387,6 @@ public class Esipaneel extends Application {
         // Show the new stage on the screen
         newStage.show();
     }
-
     public static Spordivahend otsiSpordivahend(String spordivahendNimi) {
         //System.out.println("Sisesta, mida tahad laenutada/tagastada");
         //Scanner scanner = new Scanner(System.in);
@@ -474,47 +404,13 @@ public class Esipaneel extends Application {
         }
         return valitudSpordivahend;
     }
-
     public void displayMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    public void vaataLiikmeid() throws Exception {
-        List<Isik> kontoloojad = new ArrayList<>();
-        try (DataInputStream sisse = new DataInputStream(new FileInputStream("kontod.txt"))) {
-            String eesnimi = sisse.readUTF();
-            String perenimi = sisse.readUTF();
-            String synniaeg = sisse.readUTF();
-            String isikukood = sisse.readUTF();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate synniaegDate = LocalDate.parse(synniaeg, formatter);
-            Isik uus = new Isik(eesnimi, perenimi, synniaegDate, isikukood);
-            kontoloojad.add(uus);
-            //TODO mingi list siia
 
-        }
-    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
