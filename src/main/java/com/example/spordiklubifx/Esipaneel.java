@@ -293,8 +293,8 @@ public class Esipaneel extends Application {
             String synniaegValue = synniaeg.getText();
             LocalDate synniaegDate = LocalDate.parse(synniaegValue, formatter);
             String isikukoodValue = isikukood.getText();
-            // konstruktor lisab kohe ka liikmete listi
 
+            // konstruktor lisab kohe ka liikmete listi
             Isik uusIsik;
             try {
                 uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
