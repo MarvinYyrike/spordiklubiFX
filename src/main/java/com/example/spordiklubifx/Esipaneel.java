@@ -40,7 +40,7 @@ public class Esipaneel extends Application {
         //Loon mõned spordiesemed, mis on spordiklubil laos olemas ja on võimalik laenutada
         Spordivahendid.loeSpordivahendid("spordivahendid.txt");
         Yritused.loeYritused("yritused.txt");
-
+        Liikmed.loeLiikmed("kontod.txt");
         launch(args);
     }
 
@@ -361,16 +361,7 @@ public class Esipaneel extends Application {
                 aktiivneIsik = uusIsik;
                 valitudIsik.setText(valitudIsikuNimi());
             }
-            try (DataOutputStream välja = new DataOutputStream(new FileOutputStream(("kontod.txt"), true))) {
-                välja.writeUTF(eesnimiValue);
-                välja.writeUTF(perenimiValue);
-                välja.writeUTF(synniaegValue);
-                välja.writeUTF(isikukoodValue);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
             uusKonto.close();
         });
 

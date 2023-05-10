@@ -1,12 +1,47 @@
 package com.example.spordiklubifx;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Liikmed {
   private static List<Isik> liikmed = new ArrayList<>();
 
   public Liikmed() {
+  }
+
+  public static void loeLiikmed(String file) throws Exception {
+    // nullime igaks juhuks ära seisu kui mitu korda loetakse või array on väärtustamata
+    liikmed = new ArrayList<>();
+    File fail = new File(file);
+    try (Scanner sc = new Scanner(fail, "UTF-8")) {
+      while (sc.hasNext()) {
+        String[] soned = sc.nextLine().trim().split(", ");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        Isik isik = new Isik(soned[0], soned[1], LocalDate.parse(soned[2], formatter), soned[3]);
+        liikmed.add(isik);
+      }
+    }
+  }
+
+  public static void salvestaLiikmed(String failiNimi) throws Exception {
+    File fail = new File(failiNimi);
+    FileWriter writer = new FileWriter(fail);
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    for (Isik isik : liikmed) {
+      writer.write(isik.getEesnimi() + ", "
+          + isik.getPerenimi() + ", "
+          + isik.getSynniaeg().format(formatter) + ", "
+          + isik.getIsikukood() + "\n");
+    }
+
+    writer.close();
   }
 
   private static boolean onLiige(Isik isik) {
@@ -28,18 +63,15 @@ public class Liikmed {
 
    */
 
-  //Tuleviku jaoks äkki vaja
-  /*
-  public static Isik otsiIsikEesnimega(String isikEesnimi) {
+  public static Isik otsiIsikTäisnimeJärgi(String nimi) {
     for (Isik isik : liikmed) {
-      if (isik.getEesnimi().equalsIgnoreCase(isikEesnimi)) {
+      if (nimi.toLowerCase().startsWith(isik.getEesnimi().toLowerCase()) && nimi.toLowerCase().endsWith(isik.getPerenimi().toLowerCase())) {
         return isik;
       }
     }
     return null;
   }
 
-   */
 
   public static void kuvaLiikmed() {
     for (int i = 0; i < liikmed.size(); i++) {
