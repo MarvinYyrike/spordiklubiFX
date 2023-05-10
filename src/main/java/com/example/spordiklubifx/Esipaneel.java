@@ -288,20 +288,24 @@ public class Esipaneel extends Application {
             String eesnimiValue = eesnimi.getText();
             String perenimiValue = perenimi.getText();
             String synniaegValue = synniaeg.getText();
-            LocalDate synniaegDate = LocalDate.parse(synniaegValue, formatter);
+            LocalDate synniaegDate;
+            try {
+                synniaegDate = LocalDate.parse(synniaegValue, formatter);
+            } catch (Exception e){
+                displayMessage("Viga: " + e.getMessage());
+                return;
+            }
             String isikukoodValue = isikukood.getText();
 
             // konstruktor lisab kohe ka liikmete listi
+            //Isik uusIsik new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
+
             Isik uusIsik;
             try {
                 uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
             } catch (Exception e) {
-                displayMessage("Viga: " + e.getMessage());
-                return;
+                throw new RuntimeException(e);
             }
-
-
-            //Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
 
             if(Liikmed.getLiikmed().size() == 1) {
                 aktiivneIsik = uusIsik;
