@@ -6,10 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
@@ -26,7 +23,7 @@ import java.util.List;
 public class Esipaneel extends Application {
 
     Osalemised osalemised = new Osalemised();
-    Isik aktiivneIsik = null;
+    static Isik aktiivneIsik = null;
     Yritus aktiivneYritus = null;
     Text valitudIsik = new Text(valitudIsikuNimi());
 
@@ -387,6 +384,61 @@ public class Esipaneel extends Application {
             items.add(spordivahend.getNimi());
         }
         listView.setItems(items);
+        listView.setOnMouseClicked(event -> {
+            //Mis nimega esemel klikkis:
+            final String[] itemName = {listView.getSelectionModel().getSelectedItem()};
+
+            BorderPane root = new BorderPane();
+            Text pealkiri = new Text("Mida soovid teha?");
+            pealkiri.setTextAlignment(TextAlignment.CENTER);
+            pealkiri.setWrappingWidth(600);
+            root.setTop(pealkiri);
+            pealkiri.setText("Laenuta ese");
+            Stage laenutaEse = new Stage();
+            BorderPane uusRoot =new BorderPane();
+            Scene uusaken =new Scene(uusRoot,300,300);
+            laenutaEse.setResizable(false);
+            laenutaEse.setScene(uusaken);
+            laenutaEse.setTitle("Mida soovid laenutada?");
+            // Create two TextField controls for item and money input
+            //TextField itemInput = new TextField();
+            //itemInput.setPromptText("Sisesta ese");
+
+            Label moneyInputLabel = new Label("Sisesta summa:");
+            moneyInputLabel.setAlignment(Pos.CENTER);
+            moneyInputLabel.setPrefWidth(200);
+
+            TextField moneyInput = new TextField();
+            moneyInput.setPromptText("Sisesta summa");
+            moneyInput.setPrefWidth(200);
+
+            // Add the text fields to the BorderPane layout
+            VBox vbox = new VBox(10, moneyInputLabel,
+                    moneyInput);
+            vbox.setAlignment(Pos.CENTER);
+            uusRoot.setCenter(vbox);
+            //make an enter button to enter data for method public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha)
+            // Create the enter button
+            Button enterButton = new Button("Enter");
+            enterButton.setOnAction(e -> {
+                // Get the input values from the text fields
+                int money = Integer.parseInt(moneyInput.getText());
+
+                // Find the Spordivahend object with the given name
+                Spordivahend item = otsiSpordivahend(itemName[0]);
+
+                // Call the laenutab method with the input values
+                LocalDate currentDate = LocalDate.now();
+                aktiivneIsik.laenutab(item, currentDate, money);
+
+                // Close the laenutaEse stage
+                laenutaEse.close();
+            });
+
+            // Add the enter button to the VBox layout
+            vbox.getChildren().add(enterButton);
+            laenutaEse.show();
+        });
         // Create a new Scene object that contains the ListView control
         Scene scene = new Scene(listView, 400, 400);
 
