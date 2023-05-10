@@ -25,7 +25,7 @@ public class Esipaneel extends Application {
     Osalemised osalemised = new Osalemised();
     static Isik aktiivneIsik = null;
     Yritus aktiivneYritus = null;
-    Text valitudIsik = new Text(valitudIsikuNimi());
+    static Text valitudIsik = new Text(valitudIsikuNimi());
 
     Text valitudYritus = new Text(valitudYrituseNimi());
 
@@ -123,6 +123,9 @@ public class Esipaneel extends Application {
         b5.setTextFill(Color.ROYALBLUE);
         b5.setPrefSize(300, 100);
         b5.setOnMousePressed(event -> {
+            if(aktiivneIsik == null) {
+                looUuskonto();
+            }
             pealkiri.setText("Laenuta ese");
             Stage laenutaEse = new Stage();
             BorderPane uusRoot =new BorderPane();
@@ -233,7 +236,7 @@ public class Esipaneel extends Application {
 
     }
 
-  private String valitudIsikuNimi() {
+  private static String valitudIsikuNimi() {
       Isik aktiivne = aktiivneIsik;
       if(aktiivne != null) {
           return "Valitud isik: \n" + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
@@ -249,7 +252,7 @@ public class Esipaneel extends Application {
     return "Valitud üritus: - ";
   }
 
-    public void looUuskonto() {
+    public static void looUuskonto() {
         //Konto loomise aken
         Stage uusKonto = new Stage();
         BorderPane uusRoot1 = new BorderPane();
@@ -420,6 +423,9 @@ public class Esipaneel extends Application {
             // Create the enter button
             Button enterButton = new Button("Enter");
             enterButton.setOnAction(e -> {
+                if(aktiivneIsik == null) {
+                    looUuskonto();
+                }
                 // Get the input values from the text fields
                 int money = Integer.parseInt(moneyInput.getText());
 
@@ -464,7 +470,7 @@ public class Esipaneel extends Application {
         }
         return valitudSpordivahend;
     }
-    public void displayMessage(String message) {
+    public static void displayMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
         alert.showAndWait();
