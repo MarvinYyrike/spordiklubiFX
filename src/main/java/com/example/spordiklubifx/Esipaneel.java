@@ -278,10 +278,13 @@ public class Esipaneel extends Application {
         //toob sisse liikmete nimekirja ja teeb selle põhjal isikutest koosneva kuvatavadKontod nimekirja
         List<Isik> kuvatavadKontod = Liikmed.getLiikmed();
         ObservableList<String> kontoomanikud = FXCollections.observableArrayList();
+       //lisab isikud nimekirjast kuvatavadKontod nimekirja kontoomanikud
         for (Isik isik : kuvatavadKontod) {
             kontoomanikud.add(String.valueOf(isik));
         }
+        //lisab kuvamiseks kontoomanikud listView'sse
         listView.setItems(kontoomanikud);
+        //lissb listView'le võimekuse klikkides valida soovitud konto
         listView.setOnMouseClicked(event2 -> {
             String nimi = listView.getSelectionModel().getSelectedItem();
             aktiivneIsik = Liikmed.otsiIsikTäisnimeJärgi(nimi);
@@ -296,17 +299,19 @@ public class Esipaneel extends Application {
     }
 
     private void vaataTulemusi() {
-        //TODO millegipärast ei kuva veel, vaata üle
         Stage newStage = new Stage();
         ListView<String> tulemusedListview = new ListView<>();
         ObservableList<String> tulemus = FXCollections.observableArrayList();
         if (aktiivneYritus == null) {
             // TODO siin võiks kuvada warnigut juba ennem listi loomist
+            //annab teada, kui ei ole üritusi valitud
             String nullString = "Üritust pole valitud!";
             tulemus.add(nullString);
         } else {
+            //paneb osalemiste nimekirja suvalisse järjekorda ja lisab need tulemuste nimekirja
             List<Isik> tulemused = osalemised.tulemusteArvutamine(aktiivneYritus);
             for (int i = 0; i < tulemused.size(); i++) {
+                //kuvab ekraanile selle suvalises järjekorras oleva nimekirja ühe liikme kaupa ja lisab kohanumbrid.
                 String uusTulemus = i + 1 + ". koha sai: " + tulemused.get(i);
                 tulemus.add(uusTulemus);
             }
@@ -321,6 +326,7 @@ public class Esipaneel extends Application {
     private static String valitudIsikuNimi() {
         Isik aktiivne = aktiivneIsik;
         if (aktiivne != null) {
+            //kuvab avaaknas aktiivse isiku, kui see on olemas.
             return "Valitud isik: \n" + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
         }
         return "Valitud isik: - ";
@@ -329,13 +335,14 @@ public class Esipaneel extends Application {
     private String valitudYrituseNimi() {
         Yritus aktiivne = aktiivneYritus;
         if (aktiivne != null) {
+            //kuvab avaaknas aktiivse ürituse, kui see on olemas.
+
             return "Valitud üritus: \n" + aktiivne.getNimi();
         }
         return "Valitud üritus: - ";
     }
 
     public static void looUuskonto() throws Exception {
-        //TODO millegipärast ei kirjuta õigesti faili
         Stage uusKonto = new Stage();
         BorderPane uusRoot1 = new BorderPane();
         TilePane kastid = new TilePane(2, 2);
@@ -343,7 +350,7 @@ public class Esipaneel extends Application {
         kastid.setPrefColumns(2);
         uusRoot1.setBottom(kastid);
         Scene uusaken = new Scene(uusRoot1, 400, 150);
-
+//teeb uue isiku sisestamiseks sobivad väljad
         TextField eesnimi = new TextField();
         eesnimi.setPromptText("Eesnimi");
         eesnimi.setPrefSize(200, 25);
@@ -371,20 +378,23 @@ public class Esipaneel extends Application {
         });
         Button salvesta = looSalvestaNupp(uusRoot1);
         salvesta.setOnMousePressed(event2 -> {
+            //salvesta nupu vajutamisel salvestab tekstiväljadelt saadud info vahemuutujateks
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String eesnimiValue = eesnimi.getText();
             String perenimiValue = perenimi.getText();
             String synniaegValue = synniaeg.getText();
             LocalDate synniaegDate;
             try {
+                //kontollib, kas sünniaeg sisestati õiges formaadis
                 synniaegDate = LocalDate.parse(synniaegValue, formatter);
             } catch (Exception e){
                 displayMessage("Midagi on kuupäeva sisestamisel valesti: " + e.getMessage());
                 return;
             }            String isikukoodValue = isikukood.getText();
-
+//luuakse uus isik, mis lisatakse liikmete nimekirja
             Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
             Liikmed.lisaLiige(uusIsik);
+            //uus tekkinud isik määratakse aktiivseks isikuks
             aktiivneIsik = uusIsik;
             valitudIsik.setText(valitudIsikuNimi());
 
@@ -411,7 +421,7 @@ public class Esipaneel extends Application {
         uusRoot1.setLeft(salvesta);
         return salvesta;
     }
-
+//Kuvab ürituste nimekirjas olevad üritused ListView abil lisaaknasse.
     private void vaataYritusi() {
         List<Yritus> list = Yritused.getYritused();
         Stage newStage = new Stage();
@@ -422,6 +432,7 @@ public class Esipaneel extends Application {
         }
 
         listView.setOnMouseClicked(event -> {
+            //klikkides ürituse valimine, programm otsib üritusi nime alusel
             String nimi = listView.getSelectionModel().getSelectedItem();
             aktiivneYritus = Yritused.otsiNimeKaudu(nimi);
             osalemised.lisaOsalemine(aktiivneIsik, aktiivneYritus);
