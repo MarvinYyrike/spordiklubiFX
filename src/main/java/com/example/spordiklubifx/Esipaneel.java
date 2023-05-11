@@ -34,7 +34,6 @@ public class Esipaneel extends Application {
         Spordivahendid.loeSpordivahendid("spordivahendid.txt");
         Yritused.loeYritused("yritused.txt");
         Liikmed.loeLiikmed("kontod.txt");
-
         launch(args);
     }
 
@@ -42,12 +41,13 @@ public class Esipaneel extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         BorderPane root = new BorderPane();
-
+//avaakna pealkiri, mis muutub vastavalt sellele, mida valitakse.
         Text pealkiri = new Text("Mida soovid teha?");
         pealkiri.setTextAlignment(TextAlignment.CENTER);
         pealkiri.setWrappingWidth(600);
         root.setTop(pealkiri);
 
+        //nupp, mille abil saab avaaknast sulgeda, salvestab ka uued liikmed
         Button valju = new Button("Välju");
         valju.setTextFill(Color.RED);
         valju.setPrefSize(200, 25);
@@ -58,27 +58,28 @@ public class Esipaneel extends Application {
                 pealkiri.setText("Välju");
                 Liikmed.salvestaLiikmed("kontod.txt");
             } catch (Exception e) {
-                throw new RuntimeException(e); //TODO paremad catchid lookonto jaoks
+                throw new RuntimeException(e);
             }
             primaryStage.close();
         });
 
+//"Logi sisse" nupp
         Button sisselogimine = new Button("Logi sisse");
         sisselogimine.setPrefSize(200, 25);
         root.setLeft(sisselogimine);
         root.getLeft().maxHeight(30);
         sisselogimine.setOnMouseClicked(event -> {
-            try {
+            try { //kontrollib, kas nimekirjas on juba liikmeid
                 if (Liikmed.onLiikmeid()) {
-                    vahetaKontot();
+                    vahetaKontot(); //kui on liikmeid, siis laseb valida olemasolevate kontode vahel
                 } else {
-                    looUuskonto();
+                    looUuskonto();//kui liikmeid ei ole, siis saab selle all luua uue konto
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e); //TODO paremad catchid lookonto jaoks
+                throw new RuntimeException(e);
             }
         });
-
+//HBOX  valitud isiku ja valitud ürituse kõrvuti kuvamiseks
         HBox hbox = new HBox();
         hbox.setAlignment(Pos.BASELINE_CENTER);
         hbox.setPadding(new Insets(10));
@@ -86,24 +87,25 @@ public class Esipaneel extends Application {
         valitudIsik.setTextAlignment(TextAlignment.LEFT);
         valitudYritus.setTextAlignment(TextAlignment.LEFT);
         hbox.getChildren().addAll(valitudIsik, valitudYritus);
-
+//TilePane alumiste nuppude jaoks avaaknal
         TilePane nupud = new TilePane(2, 2);
+        // nupud neljas reas, 2 tulbas
         nupud.setPrefRows(4);
         nupud.setPrefColumns(2);
-
+//VBox paneb paika TilePane's loodud nuppude ja HBoxi omavahelise paiknemise
         VBox box = new VBox();
         box.setSpacing(8);
         box.getChildren().addAll(hbox, nupud);
         root.setBottom(box);
-
+//avab vajutades akna, kus saab sisestada aktiivse isiku üritustel osalemisi
         Button b1 = new Button("Sisesta üritusel osalemine");
         b1.setTextFill(Color.ROYALBLUE);
         b1.setPrefSize(300, 100);
         b1.setOnMousePressed(event -> {
             pealkiri.setText("Sisesta üritusel osalemine");
-            //järgnev, kui ei ole veel isikut loodud
             //siin saab valida üritused
             vaataYritusi();
+            // kontrollib kas isik on valitud, saab siin isiku luua
             if (aktiivneIsik == null) {
                 try {
                     looUuskonto();
@@ -113,6 +115,7 @@ public class Esipaneel extends Application {
             }
         });
 
+        //nupp on hall ja inaktiveeritud, sest seda funktsionaalsust ei ole veel välja arendatud
         Button b2 = new Button("Otsi üritusi osaleja järgi");
         b2.setTextFill(Color.GREY);
         b2.setPrefSize(300, 100);
@@ -122,6 +125,7 @@ public class Esipaneel extends Application {
             pealkiri.setText("Otsi üritusi osaleja järgi");
         });
 
+        //nupp, millele vajutades näeb ürituste tulemuste nimekirja
         Button b3 = new Button("Vaata ürituse tulemusi");
         b3.setTextFill(Color.ROYALBLUE);
         b3.setPrefSize(300, 100);
@@ -129,7 +133,7 @@ public class Esipaneel extends Application {
             pealkiri.setText("Vaata ürituse tulemusi");
             vaataTulemusi();
         });
-
+//nupp laenutatud esemete vaatamiseks
         Button b4 = new Button("Vaata laenutatavaid esemeid");
         b4.setTextFill(Color.ROYALBLUE);
         b4.setPrefSize(300, 100);
@@ -137,7 +141,7 @@ public class Esipaneel extends Application {
             pealkiri.setText("Vaata laenutatud esemeid");
             vaataSpordivahendeid();
         });
-
+//nupp, millele vajutades pääseb esemeid laenutama
         Button b5 = new Button("Laenuta ese");
         b5.setTextFill(Color.ROYALBLUE);
         b5.setPrefSize(300, 100);
@@ -146,7 +150,7 @@ public class Esipaneel extends Application {
             avaLaenutaEse();
         });
 
-
+//Esemete tagastamine
         Button b6 = new Button("Tagasta ese");
         b6.setTextFill(Color.ROYALBLUE);
         b6.setPrefSize(300, 100);
@@ -185,7 +189,7 @@ public class Esipaneel extends Application {
             tagastaEse.show();
         });
 
-
+//nupp, mis suunab otse uue konto loomisele
         Button b7 = new Button("Loo uus konto");
         b7.setTextFill(Color.BLUE);
         b7.setPrefSize(300, 100);
@@ -197,7 +201,7 @@ public class Esipaneel extends Application {
                 throw new RuntimeException(e);
             }
         });
-
+//nupp, mis suunab kontode nimekirja
         Button b8 = new Button("Vaheta kontot");
         b8.setTextFill(Color.ROYALBLUE);
         b8.setPrefSize(300, 100);
@@ -205,12 +209,13 @@ public class Esipaneel extends Application {
             pealkiri.setText("Vaheta kontot");
             vahetaKontot();
         });
-
+//ühendab kõik loodud TilePane osad
         nupud.getChildren().addAll(b1, b2, b3, b4, b5, b6, b7, b8);
 
-
+//avaakna  kuvamine ja suuruse määramine
         root.setPadding(new Insets(5, 5, 5, 5));
         Scene kaader = new Scene(root, 620, 600);
+        //tagab selle, et avaakna suurus ei oleks muudetav
         primaryStage.setResizable(false);
         primaryStage.setScene(kaader);
         primaryStage.setTitle("Tere tulemast spordiklubi andmebaasi!");
@@ -266,9 +271,11 @@ public class Esipaneel extends Application {
         laenutaEse.show();
     }
 
+
     private void vahetaKontot() {
         Stage newStage = new Stage();
         ListView<String> listView = new ListView<>();
+        //toob sisse liikmete nimekirja ja teeb selle põhjal isikutest koosneva kuvatavadKontod nimekirja
         List<Isik> kuvatavadKontod = Liikmed.getLiikmed();
         ObservableList<String> kontoomanikud = FXCollections.observableArrayList();
         for (Isik isik : kuvatavadKontod) {
@@ -532,24 +539,3 @@ public class Esipaneel extends Application {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

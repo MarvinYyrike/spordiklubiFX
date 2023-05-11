@@ -47,7 +47,7 @@ public class Yritused {
         }
         return null;
     }
-
+//meetod kuvab nummerdatud ürituste nimekirja
     public static void kuvaYritused() {
         for (int i = 0; i < yritused.size(); i++) {
             System.out.println(i + 1 + ". üritus on: " + yritused.get(i));

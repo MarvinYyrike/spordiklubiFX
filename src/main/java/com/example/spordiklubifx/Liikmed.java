@@ -21,16 +21,18 @@ public class Liikmed {
     try (Scanner sc = new Scanner(fail, "UTF-8")) {
       while (sc.hasNext()) {
         String[] soned = sc.nextLine().trim().split(", ");
+        //kontroll, et failist loetav rida on sobival kujul
         if (soned.length != 4) {
           throw new IllegalStateException("kontod.txt fail ei ole korrektne");
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        //loob failist loodud andmete põhjal  uue isiku ja lisab selle liikmete listi
         Isik isik = new Isik(soned[0], soned[1], LocalDate.parse(soned[2], formatter), soned[3]);
         liikmed.add(isik);
       }
     }
   }
-
+//kirjutab liikmed nimekirjas olevad isikud programmile ette antud faili
   public static void salvestaLiikmed(String failiNimi) throws Exception {
     File fail = new File(failiNimi);
     try (FileWriter writer = new FileWriter(fail)) {
