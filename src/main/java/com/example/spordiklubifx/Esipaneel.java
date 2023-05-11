@@ -6,10 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
@@ -26,9 +23,9 @@ import java.util.List;
 public class Esipaneel extends Application {
 
     Osalemised osalemised = new Osalemised();
-    Isik aktiivneIsik = null;
+    static Isik aktiivneIsik = null;
     Yritus aktiivneYritus = null;
-    Text valitudIsik = new Text(valitudIsikuNimi());
+    static Text valitudIsik = new Text(valitudIsikuNimi());
 
     Text valitudYritus = new Text(valitudYrituseNimi());
 
@@ -251,6 +248,13 @@ public class Esipaneel extends Application {
 
             // Call the laenutab method with the input values
             LocalDate currentDate = LocalDate.now();
+            if (aktiivneIsik == null){
+                try {
+                    looUuskonto();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
             aktiivneIsik.laenutab(item, currentDate, money);
 
             // Close the laenutaEse stage
@@ -307,7 +311,7 @@ public class Esipaneel extends Application {
         newStage.show();
     }
 
-    private String valitudIsikuNimi() {
+    private static String valitudIsikuNimi() {
         Isik aktiivne = aktiivneIsik;
         if (aktiivne != null) {
             return "Valitud isik: \n" + aktiivne.getEesnimi() + " " + aktiivne.getPerenimi();
@@ -323,7 +327,7 @@ public class Esipaneel extends Application {
         return "Valitud üritus: - ";
     }
 
-    public void looUuskonto() throws Exception {
+    public static void looUuskonto() throws Exception {
         //TODO millegipärast ei kirjuta õigesti faili
         Stage uusKonto = new Stage();
         BorderPane uusRoot1 = new BorderPane();
@@ -364,16 +368,19 @@ public class Esipaneel extends Application {
             String eesnimiValue = eesnimi.getText();
             String perenimiValue = perenimi.getText();
             String synniaegValue = synniaeg.getText();
-            LocalDate synniaegDate = LocalDate.parse(synniaegValue, formatter);
-            String isikukoodValue = isikukood.getText();
+            LocalDate synniaegDate;
+            try {
+                synniaegDate = LocalDate.parse(synniaegValue, formatter);
+            } catch (Exception e){
+                displayMessage("Midagi on kuupäeva sisestamisel valesti: " + e.getMessage());
+                return;
+            }            String isikukoodValue = isikukood.getText();
 
             Isik uusIsik = new Isik(eesnimiValue, perenimiValue, synniaegDate, isikukoodValue);
             Liikmed.lisaLiige(uusIsik);
+            aktiivneIsik = uusIsik;
+            valitudIsik.setText(valitudIsikuNimi());
 
-            if (Liikmed.getLiikmed().size() == 1) {
-                aktiivneIsik = uusIsik;
-                valitudIsik.setText(valitudIsikuNimi());
-            }
             uusKonto.close();
         });
 
@@ -424,18 +431,78 @@ public class Esipaneel extends Application {
 
 
     private static void vaataSpordivahendeid() {
+        //To print the Spordivahendid list names
         List<Spordivahend> list = Spordivahendid.getSpordivahendList();
+        // Create a new Stage object
         Stage newStage = new Stage();
+        // Create a new ListView control
         ListView<String> listView = new ListView<>();
-
+        // Populate the ListView control with the list of Spordivahend objects
         ObservableList<String> items = FXCollections.observableArrayList();
         for (Spordivahend spordivahend : list) {
             items.add(spordivahend.getNimi());
         }
         listView.setItems(items);
-        Scene scene = new Scene(listView, 400, 400);
+        listView.setOnMouseClicked(event -> {
+            //Mis nimega esemel klikkis:
+            final String[] itemName = {listView.getSelectionModel().getSelectedItem()};
+            BorderPane root = new BorderPane();
+            Text pealkiri = new Text("Mida soovid teha?");
+            pealkiri.setTextAlignment(TextAlignment.CENTER);
+            pealkiri.setWrappingWidth(600);
+            root.setTop(pealkiri);
+            pealkiri.setText("Laenuta ese");
+            Stage laenutaEse = new Stage();
+            BorderPane uusRoot =new BorderPane();
+            Scene uusaken =new Scene(uusRoot,300,300);
+            laenutaEse.setResizable(false);
+            laenutaEse.setScene(uusaken);
+            laenutaEse.setTitle("Mida soovid laenutada?");
+            // Create two TextField controls for item and money input
+            //TextField itemInput = new TextField();
+            //itemInput.setPromptText("Sisesta ese");
+            Label moneyInputLabel = new Label("Sisesta summa:");
+            moneyInputLabel.setAlignment(Pos.CENTER);
+            moneyInputLabel.setPrefWidth(200);
+            TextField moneyInput = new TextField();
+            moneyInput.setPromptText("Sisesta summa");
+            moneyInput.setPrefWidth(200);
+            // Add the text fields to the BorderPane layout
+            VBox vbox = new VBox(10, moneyInputLabel,
+                    moneyInput);
+            vbox.setAlignment(Pos.CENTER);
+            uusRoot.setCenter(vbox);
+            //make an enter button to enter data for method public void laenutab(Spordivahend spordivahend, LocalDate kuupäev, int tasutudTagatisRaha)
+            // Create the enter button
+            Button enterButton = new Button("Enter");
+            enterButton.setOnAction(e -> {
+                if(aktiivneIsik == null) {
+                    try {
+                        looUuskonto();
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                // Get the input values from the text fields
+                int money = Integer.parseInt(moneyInput.getText());
 
+                // Find the Spordivahend object with the given name
+                Spordivahend item = otsiSpordivahend(itemName[0]);
+                // Call the laenutab method with the input values
+                LocalDate currentDate = LocalDate.now();
+                aktiivneIsik.laenutab(item, currentDate, money);
+                // Close the laenutaEse stage
+                laenutaEse.close();
+            });
+            // Add the enter button to the VBox layout
+            vbox.getChildren().add(enterButton);
+            laenutaEse.show();
+        });
+        // Create a new Scene object that contains the ListView control
+        Scene scene = new Scene(listView, 400, 400);
+        // Set the scene of the new stage to the Scene object
         newStage.setScene(scene);
+        // Show the new stage on the screen
         newStage.show();
     }
 
@@ -452,12 +519,13 @@ public class Esipaneel extends Application {
             }
         }
         if (valitudSpordivahend == null) {
-            System.out.println("Sellist eset ei ole...");
+            displayMessage("Sellist eset ei ole...");
+            //System.out.println("Sellist eset ei ole...");
         }
         return valitudSpordivahend;
     }
 
-    public void displayMessage(String message) {
+    public static void displayMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
         alert.showAndWait();
